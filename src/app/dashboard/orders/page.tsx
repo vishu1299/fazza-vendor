@@ -1,0 +1,741 @@
+"use client";
+
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Truck,
+  TrendingUp,
+  TrendingDown,
+  Search,
+  Filter,
+  Download,
+  Eye,
+  Edit,
+  ArrowUpDown,
+  Copy,
+  Calendar,
+  CreditCard,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+} from "lucide-react";
+import Image from "next/image";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+
+interface Order {
+  id: string;
+  date: string;
+  customer: string;
+  status: string;
+  amount: string;
+  payment: string;
+}
+
+const orderStats = [
+  {
+    title: "All Orders",
+    value: "10",
+    change: "+2.1%",
+    changeType: "positive",
+    iconPath: "/order-icons/all-orders.svg",
+    bgColor: "bg-purple-100",
+    hasNewBadge: false,
+  },
+  {
+    title: "New Orders",
+    value: "20",
+    change: "+12.01%",
+    changeType: "positive",
+    iconPath: "/order-icons/new-orders.svg",
+    bgColor: "bg-orange-100",
+    hasNewBadge: true,
+  },
+  {
+    title: "Processing",
+    value: "7",
+    change: "",
+    changeType: "neutral",
+    iconPath: "/order-icons/processing.svg",
+    bgColor: "bg-orange-100",
+    hasNewBadge: false,
+  },
+  {
+    title: "Shipped",
+    value: "104",
+    change: "+2.01%",
+    changeType: "positive",
+    iconPath: "/order-icons/export.svg",
+    bgColor: "bg-blue-100",
+    hasNewBadge: false,
+  },
+  {
+    title: "Delivered",
+    value: "104",
+    change: "+2.01%",
+    changeType: "positive",
+    iconPath: "/order-icons/delivered.svg",
+    bgColor: "bg-green-100",
+    hasNewBadge: false,
+  },
+  {
+    title: "Cancelled",
+    value: "03",
+    change: "+1.01%",
+    changeType: "negative",
+    iconPath: "/order-icons/canceled.svg",
+    bgColor: "bg-red-100",
+    hasNewBadge: false,
+  },
+  {
+    title: "Returned",
+    value: "03",
+    change: "+1.01%",
+    changeType: "negative",
+    iconPath: "/order-icons/returned.svg",
+    bgColor: "bg-yellow-100",
+    hasNewBadge: false,
+  },
+];
+
+const ordersData: Order[] = [
+  {
+    id: "#12450",
+    date: "05 Aug 2025",
+    customer: "Rohan Sharma",
+    status: "Pending",
+    amount: "$1,250.00",
+    payment: "Paid",
+  },
+  {
+    id: "#12450",
+    date: "05 Aug 2025",
+    customer: "Neha Gupta",
+    status: "Shipped",
+    amount: "$999.00",
+    payment: "COD",
+  },
+  {
+    id: "#12450",
+    date: "04 Aug 2025",
+    customer: "Aman Verma",
+    status: "Delivered",
+    amount: "$2,499.00",
+    payment: "Paid",
+  },
+  {
+    id: "#12450",
+    date: "04 Aug 2025",
+    customer: "Priya Mehra",
+    status: "Cancelled",
+    amount: "$1,750.00",
+    payment: "Refunded",
+  },
+];
+
+export default function Orders() {
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("Pending");
+  const [priceFilter, setPriceFilter] = useState("Above ₹200");
+  const [paymentFilter, setPaymentFilter] = useState("Paid");
+  const [productFilter, setProductFilter] = useState("Apparel");
+
+  const getStatusBadge = (status: string) => {
+    const statusStyles = {
+      Pending: "bg-orange-100 text-orange-800 border-orange-200",
+      Shipped: "bg-purple-100 text-purple-800 border-purple-200",
+      Delivered: "bg-green-100 text-green-800 border-green-200",
+      Cancelled: "bg-red-100 text-red-800 border-red-200",
+    };
+    return (
+      statusStyles[status as keyof typeof statusStyles] ||
+      "bg-gray-100 text-gray-800"
+    );
+  };
+
+  const handleViewOrder = (order: Order) => {
+    setSelectedOrder(order);
+    setIsViewModalOpen(true);
+  };
+
+  const handleEditOrder = (order: Order) => {
+    setEditingOrder({ ...order });
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveOrder = () => {
+    console.log("Saving order:", editingOrder);
+    setIsEditModalOpen(false);
+    setEditingOrder(null);
+  };
+
+  const handleCopyOrderId = (orderId: string) => {
+    navigator.clipboard.writeText(orderId);
+  };
+
+  const filteredOrders = ordersData.filter((order) => {
+    const matchesSearch =
+      order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.id.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
+  });
+
+  return (
+    <DashboardLayout>
+      <div className="p-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Orders</h1>
+          <p className="text-gray-600">
+            Manage and track all your customer orders in one place.
+          </p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {orderStats.map((stat, index) => (
+            <Card
+              key={index}
+              className="relative bg-white border border-gray-200 hover:shadow-md transition-shadow duration-200"
+            >
+              <CardContent className="">
+                <div className="flex items-start justify-between mb-3">
+                  <div
+                    className={`w-14 h-14 ${stat.bgColor} rounded-full flex items-center justify-center`}
+                  >
+                    <Image
+                      src={stat.iconPath}
+                      alt={`${stat.title} icon`}
+                      width={24}
+                      height={24}
+                      className="w-8 h-8 object-contain"
+                    />
+                  </div>
+                  {stat.hasNewBadge && (
+                    <div className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded">
+                      NEW
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    {stat.title}
+                  </p>
+                  <div className="flex items-end justify-between">
+                    <p className="text-2xl font-bold text-gray-900">
+                      {stat.value}
+                    </p>
+                    {stat.change && (
+                      <div className="flex items-center">
+                        <p
+                          className={`text-sm font-medium flex items-center ${
+                            stat.changeType === "positive"
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {stat.change}
+                        </p>
+                        {stat.changeType === "positive" ? (
+                          <TrendingUp className="w-3 h-3 ml-1 text-green-600" />
+                        ) : (
+                          <TrendingDown className="w-3 h-3 ml-1 text-red-600" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Order History */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Order History
+              </h2>
+
+              {/* Search and Actions */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Input
+                    placeholder="Search by ID, Product, or Others"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    Clear all
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-purple-600 text-white hover:bg-purple-700"
+                  >
+                    <Filter className="w-4 h-4 mr-2" />
+                    Filters
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Download className="w-4 h-4 mr-2" />
+                    CSV
+                  </Button>
+                </div>
+              </div>
+
+              {/* Filter Dropdowns */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+                <div>
+                  <Label className="text-sm font-medium text-gray-600 mb-2 block">
+                    Show
+                  </Label>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Pending">Pending</SelectItem>
+                      <SelectItem value="Shipped">Shipped</SelectItem>
+                      <SelectItem value="Delivered">Delivered</SelectItem>
+                      <SelectItem value="Cancelled">Cancelled</SelectItem>
+                      <SelectItem value="All">All Orders</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-600 mb-2 block">
+                    Price
+                  </Label>
+                  <Select value={priceFilter} onValueChange={setPriceFilter}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Above ₹200">Above ₹200</SelectItem>
+                      <SelectItem value="Below ₹200">Below ₹200</SelectItem>
+                      <SelectItem value="₹200-₹500">₹200-₹500</SelectItem>
+                      <SelectItem value="₹500-₹1000">₹500-₹1000</SelectItem>
+                      <SelectItem value="Above ₹1000">Above ₹1000</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-600 mb-2 block">
+                    Payment
+                  </Label>
+                  <Select
+                    value={paymentFilter}
+                    onValueChange={setPaymentFilter}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Paid">Paid</SelectItem>
+                      <SelectItem value="COD">COD</SelectItem>
+                      <SelectItem value="Refunded">Refunded</SelectItem>
+                      <SelectItem value="Pending">Pending</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-600 mb-2 block">
+                    Type of Products
+                  </Label>
+                  <Select
+                    value={productFilter}
+                    onValueChange={setProductFilter}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Apparel">Apparel</SelectItem>
+                      <SelectItem value="Electronics">Electronics</SelectItem>
+                      <SelectItem value="Home & Garden">
+                        Home & Garden
+                      </SelectItem>
+                      <SelectItem value="Sports">Sports</SelectItem>
+                      <SelectItem value="Books">Books</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Orders Table */}
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-gray-200">
+                    <TableHead className="w-12">
+                      <input
+                        type="checkbox"
+                        className="rounded border-gray-300"
+                      />
+                    </TableHead>
+                    <TableHead className="text-gray-600 font-medium">
+                      <div className="flex items-center space-x-1">
+                        <span>Order ID</span>
+                        <ArrowUpDown className="w-4 h-4" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-gray-600 font-medium">
+                      <div className="flex items-center space-x-1">
+                        <span>Date</span>
+                        <ArrowUpDown className="w-4 h-4" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-gray-600 font-medium">
+                      <div className="flex items-center space-x-1">
+                        <span>Customer Name</span>
+                        <ArrowUpDown className="w-4 h-4" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-gray-600 font-medium">
+                      <div className="flex items-center space-x-1">
+                        <span>Status</span>
+                        <ArrowUpDown className="w-4 h-4" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-gray-600 font-medium">
+                      <div className="flex items-center space-x-1">
+                        <span>Amount</span>
+                        <ArrowUpDown className="w-4 h-4" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-gray-600 font-medium">
+                      <div className="flex items-center space-x-1">
+                        <span>Payment</span>
+                        <ArrowUpDown className="w-4 h-4" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-gray-600 font-medium">
+                      <div className="flex items-center space-x-1">
+                        <span>Quick Actions</span>
+                        <ArrowUpDown className="w-4 h-4" />
+                      </div>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredOrders.map((order, index) => (
+                    <TableRow
+                      key={index}
+                      className="hover:bg-gray-50 transition-colors border-gray-100"
+                    >
+                      <TableCell>
+                        <input
+                          type="checkbox"
+                          className="rounded border-gray-300"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium text-gray-900">
+                            {order.id}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
+                            onClick={() => handleCopyOrderId(order.id)}
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2 text-gray-600">
+                          <Calendar className="w-4 h-4" />
+                          <span className="text-sm">{order.date}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                            {order.customer
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </div>
+                          <span className="font-medium text-gray-900">
+                            {order.customer}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStatusBadge(order.status)}>
+                          {order.status === "Pending" && (
+                            <AlertCircle className="w-3 h-3 mr-1" />
+                          )}
+                          {order.status === "Shipped" && (
+                            <Truck className="w-3 h-3 mr-1" />
+                          )}
+                          {order.status === "Delivered" && (
+                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                          )}
+                          {order.status === "Cancelled" && (
+                            <XCircle className="w-3 h-3 mr-1" />
+                          )}
+                          {order.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-semibold text-gray-900">
+                          {order.amount}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <CreditCard className="w-4 h-4 text-gray-400" />
+                          <span className="text-sm text-gray-600">
+                            {order.payment}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-gray-400 hover:text-blue-600"
+                            onClick={() => handleViewOrder(order)}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-gray-400 hover:text-green-600"
+                            onClick={() => handleEditOrder(order)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* View Order Modal */}
+        <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Order Details</DialogTitle>
+              <DialogDescription>
+                View complete information about this order
+              </DialogDescription>
+            </DialogHeader>
+            {selectedOrder && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-600">
+                      Order ID
+                    </Label>
+                    <p className="text-sm font-mono bg-gray-100 p-2 rounded">
+                      {selectedOrder.id}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-600">
+                      Date
+                    </Label>
+                    <p className="text-sm">{selectedOrder.date}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-600">
+                      Customer
+                    </Label>
+                    <p className="text-sm">{selectedOrder.customer}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-600">
+                      Status
+                    </Label>
+                    <Badge className={getStatusBadge(selectedOrder.status)}>
+                      {selectedOrder.status}
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-600">
+                      Amount
+                    </Label>
+                    <p className="text-sm font-semibold">
+                      {selectedOrder.amount}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-600">
+                      Payment
+                    </Label>
+                    <p className="text-sm">{selectedOrder.payment}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsViewModalOpen(false)}
+              >
+                Close
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsViewModalOpen(false);
+                  if (selectedOrder) {
+                    handleEditOrder(selectedOrder);
+                  }
+                }}
+              >
+                Edit Order
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Order Modal */}
+        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Edit Order</DialogTitle>
+              <DialogDescription>
+                Update order information and status
+              </DialogDescription>
+            </DialogHeader>
+            {editingOrder && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="customer">Customer Name</Label>
+                    <Input
+                      id="customer"
+                      value={editingOrder.customer}
+                      onChange={(e) =>
+                        setEditingOrder({
+                          ...editingOrder,
+                          customer: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="status">Status</Label>
+                    <Select
+                      value={editingOrder.status}
+                      onValueChange={(value) =>
+                        setEditingOrder({ ...editingOrder, status: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="Shipped">Shipped</SelectItem>
+                        <SelectItem value="Delivered">Delivered</SelectItem>
+                        <SelectItem value="Cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="amount">Amount</Label>
+                    <Input
+                      id="amount"
+                      value={editingOrder.amount}
+                      onChange={(e) =>
+                        setEditingOrder({
+                          ...editingOrder,
+                          amount: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="payment">Payment Status</Label>
+                    <Select
+                      value={editingOrder.payment}
+                      onValueChange={(value) =>
+                        setEditingOrder({ ...editingOrder, payment: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Paid">Paid</SelectItem>
+                        <SelectItem value="COD">COD</SelectItem>
+                        <SelectItem value="Refunded">Refunded</SelectItem>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="notes">Order Notes</Label>
+                  <Textarea
+                    id="notes"
+                    placeholder="Add any notes about this order..."
+                    rows={3}
+                  />
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsEditModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleSaveOrder}>Save Changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </DashboardLayout>
+  );
+}
