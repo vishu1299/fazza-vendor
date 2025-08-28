@@ -115,12 +115,12 @@ const sidebarItems: SidebarItem[] = [
       },
       {
         label: "Net Earnings Calculation",
-        href: "/dashboard/payout/net-earnings",
+        href: "/dashboard/payout/net-earning",
         iconPath: "/payout/Calculation.svg",
       },
       {
         label: "Sales by Category / Product",
-        href: "/dashboard/payout/sales-category",
+        href: "/dashboard/payout/sales-categories",
         iconPath: "/payout/SalesCategory.svg",
       },
     ],
