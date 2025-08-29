@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,8 @@ const steps = [
 
 export default function BankPaymentSetup() {
   const [currentStep] = useState(3);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const [formData, setFormData] = useState({
     bankName: "",
     accountNumber: "",
@@ -36,6 +39,28 @@ export default function BankPaymentSetup() {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCompleteSetup = async () => {
+    setIsLoading(true);
+
+    try {
+      // Simulate API call for completing signup
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Show success message
+      alert(
+        "Registration completed successfully! Please sign in with your credentials."
+      );
+
+      // Navigate back to signin page
+      router.push("/");
+    } catch (error) {
+      console.error("Setup completion error:", error);
+      alert("Setup failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -287,8 +312,12 @@ export default function BankPaymentSetup() {
                       Previous
                     </Button>
                   </Link>
-                  <Button className="w-full sm:flex-1 h-10 sm:h-12 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg">
-                    Complete Setup
+                  <Button
+                    onClick={handleCompleteSetup}
+                    disabled={isLoading}
+                    className="w-full sm:flex-1 h-10 sm:h-12 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? "Completing Setup..." : "Complete Setup"}
                   </Button>
                 </div>
               </div>

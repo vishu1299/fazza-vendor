@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   BarChart3,
   ShoppingBag,
@@ -134,6 +138,7 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const pathname = usePathname();
@@ -157,13 +162,51 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return pathname.startsWith(href);
   };
 
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    try {
+      // Show logout toast
+      toast.success("Logged out successfully!");
+
+      // Simulate logout delay
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
+    } catch (error) {
+      toast.error("Logout failed. Please try again.");
+    }
+  };
+
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <motion.div
+      className="flex min-h-screen bg-gray-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       {/* Sidebar */}
-      <div
-        className={`${
-          sidebarOpen ? "w-70" : "w-16"
-        } bg-white shadow-lg transition-all duration-300 flex flex-col`}
+      <motion.div
+        className="bg-white shadow-lg flex flex-col"
+        animate={{
+          width: sidebarOpen ? 280 : 64,
+        }}
+        transition={{
+          duration: 0.3,
+          ease: "easeInOut",
+        }}
       >
         {/* Logo */}
         <div className="px-4 py-5 border-b border-gray-200">
@@ -279,8 +322,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* Logout */}
         <div className="px-3 py-4 border-t border-gray-200">
-          <Link
-            href="/"
+          <button
+            onClick={handleLogout}
             className="group flex items-center w-full px-3 py-3 rounded-lg transition-all duration-200 text-red-600 hover:bg-red-50"
           >
             <div className="flex items-center space-x-3 flex-1 min-w-0">
@@ -289,14 +332,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <span className="text-base font-semibold truncate">Logout</span>
               )}
             </div>
-          </Link>
+          </button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <motion.div
+        className="flex-1 flex flex-col overflow-hidden"
+        initial={{ x: 20, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
         {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Image
@@ -330,8 +378,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 w-auto h-full overflow-y-auto">{children}</main>
-      </div>
-    </div>
+        <motion.main
+          className="flex-1 w-auto h-full overflow-y-auto"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.4 }}
+        >
+          {children}
+        </motion.main>
+      </motion.div>
+    </motion.div>
   );
 }
