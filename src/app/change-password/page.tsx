@@ -103,7 +103,7 @@ function ChangePasswordContent() {
         transition={{ duration: 0.6, delay: 0.1 }}
         className="w-full max-w-md"
       >
-        <Card className="bg-white shadow-xl border-0">
+        <Card className="bg-white shadow-xl border-0 h-[90vh] overflow-y-scroll">
           <CardContent className="p-8">
             {/* Header */}
             <div className="text-center mb-8">
