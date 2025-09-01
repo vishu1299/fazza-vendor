@@ -3,6 +3,7 @@
 import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -106,6 +107,15 @@ function ChangePasswordContent() {
           <CardContent className="p-8">
             {/* Header */}
             <div className="text-center mb-8">
+              <div className="flex justify-center mb-4">
+                <Image
+                  src="/Logo.png"
+                  alt="Logo"
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto"
+                />
+              </div>
               <div className="flex items-center justify-center mb-4">
                 <Link
                   href={`/verify-otp?method=${method}&contact=${encodeURIComponent(

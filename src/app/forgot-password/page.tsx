@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,6 +91,15 @@ export default function ForgotPassword() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
+              <div className="flex justify-center mb-4">
+                <Image
+                  src="/Logo.png"
+                  alt="Logo"
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto"
+                />
+              </div>
               <div className="flex items-center justify-center mb-4">
                 <Link href="/" className="mr-4">
                   <motion.div

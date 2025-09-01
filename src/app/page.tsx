@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -80,6 +81,15 @@ export default function SignIn() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
+              <div className="flex justify-center mb-4">
+                <Image
+                  src="/Logo.png"
+                  alt="Logo"
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto"
+                />
+              </div>
               <h1 className="text-2xl font-semibold text-gray-900">Sign In</h1>
             </motion.div>
 
@@ -158,7 +168,7 @@ export default function SignIn() {
                   disabled={isLoading}
                   className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-lg"
                 >
-                  {isLoading ? "Signing In..." : "Sign In Mandaean Account"}
+                  {isLoading ? "Signing In..." : "Sign In Fazza Account"}
                 </Button>
               </motion.div>
             </motion.form>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -162,6 +163,7 @@ const ordersData: Order[] = [
 ];
 
 export default function Orders() {
+  const router = useRouter();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -203,6 +205,10 @@ export default function Orders() {
 
   const handleCopyOrderId = (orderId: string) => {
     navigator.clipboard.writeText(orderId);
+  };
+
+  const handleTrackOrder = (orderId: string) => {
+    router.push(`/dashboard/orders/trackorder?orderId=${orderId}`);
   };
 
   const filteredOrders = ordersData.filter((order) => {
@@ -548,6 +554,15 @@ export default function Orders() {
                             onClick={() => handleEditOrder(order)}
                           >
                             <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-gray-400 hover:text-orange-600"
+                            onClick={() => handleTrackOrder(order.id)}
+                            title="Track Order"
+                          >
+                            <Truck className="w-4 h-4" />
                           </Button>
                         </div>
                       </TableCell>

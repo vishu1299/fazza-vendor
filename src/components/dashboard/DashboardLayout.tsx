@@ -2,7 +2,8 @@
 
 import { useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast, ToastContainer } from "react-toastify";
@@ -23,7 +24,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 interface SidebarItem {
@@ -213,10 +213,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex items-center justify-between">
             {sidebarOpen && (
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">F</span>
-                </div>
-                <span className="font-bold text-xl text-gray-900">FAZZA</span>
+                <Image
+                  src="/Logo.png"
+                  alt="Logo"
+                  width={120}
+                  height={40}
+                  className="h-8 w-auto"
+                />
               </div>
             )}
             <Button

@@ -122,9 +122,9 @@ export default function SignUp() {
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6 sm:mb-8">
+        {/* <div className="flex justify-between items-center mb-6 sm:mb-8">
           <div className="text-lg sm:text-xl font-bold text-gray-900">LOGO</div>
-        </div>
+        </div> */}
 
         {/* Title and Stepper */}
         <div className="text-center mb-8 sm:mb-12">
@@ -200,6 +200,15 @@ export default function SignUp() {
           >
             <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 lg:p-10 xl:p-12">
               <div className="text-center mb-6 sm:mb-8">
+                <div className="flex justify-center mb-4">
+                  <Image
+                    src="/Logo.png"
+                    alt="Logo"
+                    width={120}
+                    height={40}
+                    className="h-10 w-auto"
+                  />
+                </div>
                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
                   Become a Seller
                 </h2>
